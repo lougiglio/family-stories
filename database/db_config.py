@@ -1,7 +1,4 @@
 from pymongo import MongoClient
-from gridfs import GridFS
-from bson.objectid import ObjectId
-from datetime import datetime
 import yaml
 from pathlib import Path
 
@@ -35,7 +32,6 @@ class DatabaseManager:
         try:
             self.client = MongoClient(self.db_settings['mongodb_uri'])
             self.db = self.client[self.db_settings['database_name']]
-            self.fs = GridFS(self.db)
             
             # Create indexes
             self.db.responses.create_index([

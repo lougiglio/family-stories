@@ -88,27 +88,20 @@ class FamilyStoriesApp:
                 _, msg_data = mail.fetch(msg_num, '(RFC822)')
                 email_body = msg_data[0][1]
                 email_message = email.message_from_bytes(email_body)
-                sender = email.utils.parseaddr(email_message['from'])[1]  # Extract sender's email
+                sender = email.utils.parseaddr(email_message['from'])[1]
 
-                media_files = []
+                # Get plain text content
+                response_text = ""
                 for part in email_message.walk():
                     if part.get_content_type() == "text/plain":
                         response_text = part.get_payload(decode=True).decode()
-                    elif part.get_filename():
-                        content_type = part.get_content_type()
-                        if content_type.startswith(('audio/', 'video/', 'image/')):
-                            media_files.append({
-                                'content': part.get_payload(decode=True),
-                                'filename': part.get_filename(),
-                                'content_type': content_type
-                            })
+                        break
 
                 # Store response using DAO
                 self.response_dao.store_response(
                     self.current_question_index,
                     sender,
-                    response_text,
-                    media_files
+                    response_text
                 )
 
             mail.close()
