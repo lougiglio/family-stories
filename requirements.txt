@@ -1,0 +1,5 @@
+pymongo
+pyyaml
+pandas
+schedule
+python-dotenv
