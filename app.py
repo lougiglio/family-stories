@@ -23,10 +23,10 @@ class FamilyStoriesApp:
             self.email_settings = config['email']
         self.family_members = self.load_family_members()
     
-    def load_family_members(self, csv_file='family_members.csv'):
+    def load_family_members(self, csv_file='emails.csv'):
         try:
             df = pd.read_csv(csv_file)
-            return [{'email': email} for email in df['email']]
+            return [{'name': name, 'email': email} for name, email in zip(df['name'], df['email'])]
         except Exception as e:
             print(f"Failed to load family members: {str(e)}")
             return []
@@ -39,14 +39,14 @@ class FamilyStoriesApp:
             print(f"Failed to load questions: {str(e)}")
             return []
     
-    def send_email(self, to_email, question):
+    def send_email(self, member, question):
         msg = MIMEMultipart('alternative')
         msg['From'] = self.email_settings['username']
-        msg['To'] = to_email
+        msg['To'] = member['email']
         msg['Subject'] = "Weekly Family Story Question"
         
         # Get email content from template
-        text, html = EmailTemplate.get_email_content(question)
+        text, html = EmailTemplate.get_email_content(question, member['name'])
         
         # Attach both plain text and HTML versions
         part1 = MIMEText(text, 'plain')
@@ -61,9 +61,9 @@ class FamilyStoriesApp:
             server.login(self.email_settings['username'], self.email_settings['password'])
             server.send_message(msg)
             server.quit()
-            print(f"Email sent successfully to {to_email}")
+            print(f"Email sent successfully to {member['email']}")
         except Exception as e:
-            print(f"Failed to send email to {to_email}: {str(e)}")
+            print(f"Failed to send email to {member['email']}: {str(e)}")
 
     def send_weekly_questions(self):
         if not self.questions:
@@ -72,47 +72,74 @@ class FamilyStoriesApp:
             
         question = self.questions[self.current_question_index]
         for member in self.family_members:
-            self.send_email(member['email'], question)
+            self.send_email(member, question)
         
         self.current_question_index = (self.current_question_index + 1) % len(self.questions)
 
     def check_email_responses(self):
         try:
+            print(f"Connecting to IMAP server: {self.email_settings['imap_server']}")
             mail = imaplib.IMAP4_SSL(self.email_settings['imap_server'])
+            print("Logging in...")
             mail.login(self.email_settings['username'], self.email_settings['password'])
+            print("Selecting inbox...")
             mail.select('inbox')
 
-            _, messages = mail.search(None, 'UNSEEN')
+            # Only search for replies (subject starting with "Re:")
+            print("Searching for unread response messages...")
+            _, messages = mail.search(None, 'UNSEEN SUBJECT "Re: Weekly Family Story Question"')
+            
+            message_count = len(messages[0].split())
+            print(f"Found {message_count} unread responses")
 
+            current_question = self.questions[self.current_question_index]
+            
             for msg_num in messages[0].split():
+                print(f"Processing message {msg_num}...")
                 _, msg_data = mail.fetch(msg_num, '(RFC822)')
                 email_body = msg_data[0][1]
                 email_message = email.message_from_bytes(email_body)
-                sender = email.utils.parseaddr(email_message['from'])[1]
+                sender_email = email.utils.parseaddr(email_message['from'])[1]
+                
+                # Find the family member's name from our list
+                sender_name = next(
+                    (member['name'] for member in self.family_members 
+                     if member['email'] == sender_email),
+                    'Unknown'
+                )
+                print(f"Message from: {sender_name} ({sender_email})")
 
-                # Get plain text content
                 response_text = ""
                 for part in email_message.walk():
                     if part.get_content_type() == "text/plain":
                         response_text = part.get_payload(decode=True).decode()
                         break
 
-                # Store response using DAO
+                print(f"Storing response from {sender_email}...")
                 self.response_dao.store_response(
                     self.current_question_index,
-                    sender,
-                    response_text
+                    sender_email,
+                    response_text,
+                    sender_name,
+                    current_question
                 )
 
             mail.close()
             mail.logout()
+            print("Email check completed successfully")
 
         except Exception as e:
             print(f"Error checking email responses: {str(e)}")
+            raise
 
 def main():
     app = FamilyStoriesApp()
+    
+    # Schedule weekly question sending
     schedule.every().sunday.at("09:00").do(app.send_weekly_questions)
+    
+    # Schedule email response checking every 5 minutes
+    schedule.every(5).minutes.do(app.check_email_responses)
     
     print("Family Stories App is running...")
     while True:

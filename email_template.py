@@ -1,9 +1,9 @@
 class EmailTemplate:
     @staticmethod
-    def get_email_content(question):
+    def get_email_content(question, recipient_name):
         # Plain text version
         text = f"""
-        Dear Family Member,
+        Dear {recipient_name},
         
         This week's question is:
         
@@ -20,7 +20,7 @@ class EmailTemplate:
         <html>
             <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <h2 style="color: #2c3e50;">Weekly Family Story</h2>
-                <p style="color: #34495e;">Dear Family Member,</p>
+                <p style="color: #34495e;">Dear {recipient_name},</p>
                 
                 <div style="background-color: #f7f9fc; padding: 20px; border-radius: 5px; margin: 20px 0;">
                     <p style="font-style: italic; color: #7f8c8d;">This week's question is:</p>

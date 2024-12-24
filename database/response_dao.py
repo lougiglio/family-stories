@@ -7,12 +7,14 @@ class ResponseDAO:
         self.db_manager = DatabaseManager()
         self.db = self.db_manager.db
 
-    def store_response(self, question_id, sender_email, response_text):
+    def store_response(self, question_id, sender_email, response_text, sender_name, question_text):
         """Store response in MongoDB"""
         try:
             response_doc = {
                 "question_id": question_id,
+                "question_text": question_text,
                 "family_member_email": sender_email,
+                "family_member_name": sender_name,
                 "response_text": response_text,
                 "response_date": datetime.now()
             }
