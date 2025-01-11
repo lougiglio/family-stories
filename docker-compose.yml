@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  family-stories:
+    build: .
+    restart: always
+    environment:
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+    volumes:
+      - ./emails.csv:/app/emails.csv
+      - ./questions.csv:/app/questions.csv
+    healthcheck:
+      test: ["CMD", "python", "-c", "from app import FamilyStoriesApp; app = FamilyStoriesApp(); exit(0 if app.health_check() else 1)"]
+      interval: 5m
+      timeout: 30s
+      retries: 3
+      start_period: 30s

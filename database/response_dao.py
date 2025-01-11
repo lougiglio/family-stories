@@ -42,4 +42,28 @@ class ResponseDAO:
 
     def get_responses_by_email(self, email):
         """Get all responses from a specific family member"""
-        return list(self.db.responses.find({"family_member_email": email})) 
+        return list(self.db.responses.find({"family_member_email": email}))
+
+    def get_or_create_question_index(self):
+        """Get the current question index or create it if it doesn't exist"""
+        state = self.db.app_state.find_one({"_id": "question_index"})
+        if not state:
+            self.db.app_state.insert_one({
+                "_id": "question_index",
+                "current_index": 0
+            })
+            return 0
+        return state["current_index"]
+
+    def update_question_index(self, index, question_text):
+        """Update the current question index and text"""
+        self.db.app_state.update_one(
+            {"_id": "question_index"},
+            {
+                "$set": {
+                    "current_index": index,
+                    "current_question": question_text
+                }
+            },
+            upsert=True
+        ) 

@@ -4,7 +4,18 @@ email:
   username: "mggummow@gmail.com"
   password: "innr syza kruq tnwz"
   imap_server: "imap.gmail.com"
+  rate_limit:
+    delay_between_emails: 5  # seconds
+    max_emails_per_hour: 100 # prevent hitting email provider limits
+
 
 database:
   mongodb_uri: "mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@vds.dannydemosi.com:27017"
   database_name: "family_stories"
+
+healthcheck:
+  test: ["CMD", "python", "-c", "from app import FamilyStoriesApp; app = FamilyStoriesApp(); print(app.health_check())"]
+  interval: 1m
+  timeout: 10s
+  retries: 3
+  start_period: 40s
