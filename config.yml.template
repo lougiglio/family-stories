@@ -10,7 +10,7 @@ email:
 
 database:
   mongodb_uri: "mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@vds.dannydemosi.com:9091"
-  database_name: "family_stories"
+  database_name: "app"
 
 healthcheck:
   test: ["CMD", "python", "-c", "from app import FamilyStoriesApp; app = FamilyStoriesApp(); print(app.health_check())"]

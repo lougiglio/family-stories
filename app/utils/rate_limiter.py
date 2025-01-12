@@ -2,6 +2,8 @@ import time
 import logging
 from datetime import datetime, timedelta
 
+logger = logging.getLogger(__name__)
+
 class EmailRateLimiter:
     def __init__(self, max_emails_per_hour, delay_between_emails):
         self.max_emails_per_hour = max_emails_per_hour
@@ -23,7 +25,7 @@ class EmailRateLimiter:
         if self.emails_sent >= self.max_emails_per_hour:
             wait_seconds = 3600 - (current_time - self.period_start).total_seconds()
             if wait_seconds > 0:
-                logging.info(f"Hourly rate limit reached. Waiting {wait_seconds:.2f} seconds...")
+                logger.info(f"Hourly rate limit reached. Waiting {wait_seconds:.2f} seconds...")
                 time.sleep(wait_seconds)
                 self.emails_sent = 0
                 self.period_start = datetime.now()
@@ -33,4 +35,13 @@ class EmailRateLimiter:
 
     def record_email_sent(self):
         """Record that an email was sent"""
-        self.emails_sent += 1 
+        self.emails_sent += 1
+
+    def get_status(self):
+        """Get current rate limit status"""
+        return {
+            "emails_sent_this_hour": self.emails_sent,
+            "period_start": self.period_start.isoformat(),
+            "max_emails_per_hour": self.max_emails_per_hour,
+            "delay_between_emails": self.delay_between_emails
+        } 

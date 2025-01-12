@@ -1,8 +1,8 @@
 email:
   smtp_server: "smtp.gmail.com"
   smtp_port: 587
-  username: "mggummow@gmail.com"
-  password: "innr syza kruq tnwz"
+  username: "${EMAIL_USERNAME}"
+  password: "${EMAIL_PASSWORD}"
   imap_server: "imap.gmail.com"
   rate_limit:
     delay_between_emails: 5  # seconds
@@ -11,7 +11,7 @@ email:
 
 database:
   mongodb_uri: "mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@vds.dannydemosi.com:27017"
-  database_name: "family_stories"
+  database_name: "app"
 
 healthcheck:
   test: ["CMD", "python", "-c", "from app import FamilyStoriesApp; app = FamilyStoriesApp(); print(app.health_check())"]

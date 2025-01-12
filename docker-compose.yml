@@ -11,6 +11,8 @@ services:
     volumes:
       - ./emails.csv:/app/emails.csv
       - ./questions.csv:/app/questions.csv
+      - ./quotes.csv:/app/quotes.csv
+      - ./email_templates:/app/email_templates
     healthcheck:
       test: ["CMD", "python", "-c", "from app import FamilyStoriesApp; app = FamilyStoriesApp(); exit(0 if app.health_check() else 1)"]
       interval: 5m
