@@ -56,7 +56,7 @@ class Config:
             if not isinstance(self.email_settings[setting], expected_type):
                 raise TypeError(f"Invalid type for {setting}")
 
-    def load_family_members(self, csv_file='emails.csv'):
+    def load_family_members(self, csv_file='data/emails.csv'):
         try:
             file_path = os.path.join(os.path.dirname(__file__), '..', '..', csv_file)
             if not os.path.exists(file_path):
@@ -68,18 +68,24 @@ class Config:
             logger.error(f"Failed to load family members: {str(e)}")
             return []
 
-    def load_questions(self, csv_file='questions.csv'):
+    def load_questions(self, csv_file='data/questions.csv'):
         try:
-            df = pd.read_csv(csv_file)
+            file_path = os.path.join(os.path.dirname(__file__), '..', '..', csv_file)
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"CSV file not found: {file_path}")
+            df = pd.read_csv(file_path)
             return [{'question': row['Question'], 'questioner': row['Questioner']} 
                    for _, row in df.iterrows()]
         except Exception as e:
             logger.error(f"Failed to load questions: {str(e)}")
             return []
 
-    def load_quotes(self, csv_file='quotes.csv'):
+    def load_quotes(self, csv_file='data/quotes.csv'):
         try:
-            df = pd.read_csv(csv_file)
+            file_path = os.path.join(os.path.dirname(__file__), '..', '..', csv_file)
+            if not os.path.exists(file_path):
+                raise FileNotFoundError(f"CSV file not found: {file_path}")
+            df = pd.read_csv(file_path)
             return [{'quote': row['Quote'], 'author': row['Author']} 
                    for _, row in df.iterrows()]
         except Exception as e:

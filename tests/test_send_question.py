@@ -28,7 +28,7 @@ def test_send_first_question():
         
         print("Initializing FamilyStoriesApp...")
         app = FamilyStoriesApp()
-        app.family_members = app.load_family_members('emails.csv')
+        app.family_members = app.load_family_members('data/emails.csv')
         
         print("\nChecking loaded configuration:")
         print(f"Email settings: {app.email_settings}")

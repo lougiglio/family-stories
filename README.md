@@ -66,11 +66,11 @@ pip install -r requirements.txt
 
 ### 4. Prepare CSV Files
 
-Ensure the following CSV files are present in the root directory:
+Ensure the following CSV files are present in the `data` directory:
 
-- `emails.csv`: Contains family members' names and email addresses.
-- `questions.csv`: Lists the weekly questions and the person who posed each question.
-- `quotes.csv`: Includes quotes and their authors to be featured in the emails.
+- `data/emails.csv`: Contains family members' names and email addresses.
+- `data/questions.csv`: Lists the weekly questions and the person who posed each question.
+- `data/quotes.csv`: Includes quotes and their authors to be featured in the emails.
 
 ### 5. Configure Application
 

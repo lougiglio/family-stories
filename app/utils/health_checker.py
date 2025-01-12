@@ -10,9 +10,9 @@ class HealthChecker:
     def __init__(self, app):
         self.app = app
         self.required_files = {
-            'emails.csv': False,
-            'questions.csv': False,
-            'config.yml': False
+            'data/emails.csv': False,
+            'data/questions.csv': False,
+            'config/config.yml': False
         }
         self.required_env_vars = [
             'EMAIL_USERNAME',

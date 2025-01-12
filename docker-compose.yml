@@ -9,10 +9,11 @@ services:
       - MONGODB_USERNAME=${MONGODB_USERNAME}
       - MONGODB_PASSWORD=${MONGODB_PASSWORD}
     volumes:
-      - ./emails.csv:/app/emails.csv
-      - ./questions.csv:/app/questions.csv
-      - ./quotes.csv:/app/quotes.csv
+      - ./data/emails.csv:/app/data/emails.csv
+      - ./data/questions.csv:/app/data/questions.csv
+      - ./data/quotes.csv:/app/data/quotes.csv
       - ./email_templates:/app/email_templates
+
     healthcheck:
       test: ["CMD", "python", "-c", "from app import FamilyStoriesApp; app = FamilyStoriesApp(); exit(0 if app.health_check() else 1)"]
       interval: 5m

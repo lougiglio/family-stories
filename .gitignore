@@ -1,10 +1,7 @@
 # Project specific
 config.yml
 .env
-*.csv
-!example/*.csv
 logs/
-email_templates/
 
 # Python
 __pycache__/
