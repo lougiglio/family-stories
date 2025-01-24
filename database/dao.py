@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import time
-from app.database.db_config import DatabaseManager
+from database import DatabaseManager
 
 logger = logging.getLogger(__name__)
 

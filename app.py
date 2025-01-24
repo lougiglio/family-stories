@@ -1,9 +1,8 @@
-from app.email.sender import EmailSender
-from app.email.receiver import EmailReceiver
+from email.sender import EmailSender
+from email.receiver import EmailReceiver
 from app.database.dao import ResponseDAO
 from app.utils.health_checker import HealthChecker
 from app.utils.rate_limiter import EmailRateLimiter
-from app.core.config import Config
 import logging
 import schedule
 

@@ -1,11 +1,16 @@
 import re
 import logging
+import time
+from datetime import datetime
 from pymongo import MongoClient
 from pymongo.errors import ConnectionError, OperationFailure
 
 logger = logging.getLogger(__name__)
 
 class DatabaseManager:
+    MAX_RETRIES = 3
+    RETRY_DELAY = 1  # seconds
+
     def __init__(self, config=None):
         if not config or not config.db_settings:
             raise ValueError("Database configuration is required")
