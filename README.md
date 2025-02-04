@@ -57,7 +57,7 @@ git checkout -f main  # -f flag to overwrite existing files
    ```bash
    # Make sure you're in the project root directory, not the build directory
    cd build
-   docker compose up --build
+   docker-compose up --build
    ```
 
 #### Windows

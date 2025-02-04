@@ -17,6 +17,7 @@ class EmailSender:
         """Send weekly question email to a family member"""
         try:
             logger.info(f"Sending weekly question to {recipient_email}")
+            logger.debug(f"Attempting to connect to SMTP server {self.smtp_server}:{self.smtp_port}")
             
             # Get email content
             html_content = WeeklyQuestionEmail.get_content(
@@ -37,13 +38,34 @@ class EmailSender:
             # Attach HTML version
             msg.attach(MIMEText(html_content, 'html'))
             
-            # Send email
-            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+            # Send email with detailed logging
+            try:
+                logger.debug("Creating SMTP connection...")
+                server = smtplib.SMTP(self.smtp_server, self.smtp_port)
+                
+                logger.debug("Starting TLS...")
                 server.starttls()
+                
+                logger.debug(f"Attempting login for user {self.username}")
                 server.login(self.username, self.password)
+                
+                logger.debug("Sending message...")
                 server.send_message(msg)
                 
-            logger.info(f"Successfully sent weekly question to {recipient_email}")
+                logger.debug("Closing connection...")
+                server.quit()
+                
+                logger.info(f"Successfully sent weekly question to {recipient_email}")
+                
+            except smtplib.SMTPAuthenticationError as auth_error:
+                logger.error(f"SMTP Authentication failed: {str(auth_error)}")
+                raise
+            except smtplib.SMTPException as smtp_error:
+                logger.error(f"SMTP error occurred: {str(smtp_error)}")
+                raise
+            except Exception as e:
+                logger.error(f"Unexpected error during SMTP operation: {str(e)}")
+                raise
             
         except Exception as e:
             logger.error(f"Failed to send weekly question to {recipient_email}: {str(e)}")
