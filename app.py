@@ -59,8 +59,8 @@ class FamilyStoriesApp:
                     self.email_sender.send_weekly_question(
                         recipient_email=member['email'],
                         recipient_name=member['name'],
-                        questioner_name=current_question['Questioner'],
-                        question=current_question['Question'],
+                        questioner_name=current_question['questioner'],
+                        question=current_question['question'],
                         quote=current_quote['quote'],
                         quote_author=current_quote['author'],
                         question_number=self.current_question_index + 1
