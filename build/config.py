@@ -51,10 +51,10 @@ class Config:
             mongodb_host = os.getenv('MONGODB_HOST', 'localhost')
             mongodb_port = os.getenv('MONGODB_PORT', '27017')
             
-            # Construct MongoDB URI
+            # Construct MongoDB URI with authSource
             self.db_settings = {
-                'mongodb_uri': f"mongodb://{mongodb_username}:{mongodb_password}@{mongodb_host}:{mongodb_port}",
-                'database_name': config.get('database', {}).get('database_name', 'family_stories')
+                'mongodb_uri': f"mongodb://{mongodb_username}:{mongodb_password}@{mongodb_host}:{mongodb_port}/family_stories?authSource=admin",
+                'database_name': 'family_stories'
             }
             
             self._validate_config()

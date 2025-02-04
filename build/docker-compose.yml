@@ -7,14 +7,9 @@ services:
     restart: always
     env_file:
       - ../.env
-    environment:
-      - EMAIL_USERNAME=${EMAIL_USERNAME}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
-      - MONGODB_USERNAME=${MONGODB_USERNAME}
-      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-      - MONGODB_HOST=${MONGODB_HOST}
-      - MONGODB_PORT=${MONGODB_PORT}
     network_mode: "host"
+    extra_hosts:
+      - "mongodb:${MONGODB_HOST}"
     volumes:
       - ../assets/emails.csv:/app/assets/emails.csv
       - ../assets/questions.csv:/app/assets/questions.csv

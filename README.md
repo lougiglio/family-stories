@@ -5,40 +5,61 @@ A Python application that sends weekly questions to family members and collects 
 ## VM Deployment & Management
 
 ### Initial Setup
-1. Clone the repository:
+
+#### Option A: New Installation
+1. Create and navigate to your project directory:
    ```bash
-   git clone https://github.com/yourusername/family-stories.git
-   cd family-stories
+   mkdir -p /opt/family-stories
+   cd /opt/family-stories
    ```
 
-2. Create and configure `.env` file:
+2. Initialize git and add remote repository:
+   ```bash
+   git init
+   git remote add origin https://github.com/yourusername/family-stories.git
+   git fetch
+   git checkout main
+   ```
+
+#### Option B: Existing Directory
+If you already have a family-stories directory:
+```bash
+cd family-stories  # if not already in the directory
+git init
+git remote add origin https://github.com/yourusername/family-stories.git
+git fetch
+git checkout -f main  # -f flag to overwrite existing files
+```
+
+### Configuration
+1. Create and configure `.env` file:
    ```bash
    cp .env.template .env
    # Edit .env with your MongoDB and Email credentials
    ```
 
-3. Install Docker and Docker Compose:
+2. Install Docker and Docker Compose:
    ```bash
    sudo apt-get update
    sudo apt-get install -y docker.io docker-compose
    ```
 
 ### Running the Application
-1. Start the application:
+1. Start the application (from the project root directory):
    ```bash
-   cd build
-   docker-compose up -d
+   # Make sure you're in the project root directory, not the build directory
+   docker-compose -f build/docker-compose.yml up -d
    ```
 
 2. Check application status:
    ```bash
-   docker-compose ps
-   docker-compose logs -f
+   docker-compose -f build/docker-compose.yml ps
+   docker-compose -f build/docker-compose.yml logs -f
    ```
 
 3. Stop the application:
    ```bash
-   docker-compose down
+   docker-compose -f build/docker-compose.yml down
    ```
 
 ### Updating the Application
@@ -47,11 +68,10 @@ A Python application that sends weekly questions to family members and collects 
    git pull origin main
    ```
 
-2. Rebuild and restart the container:
+2. Rebuild and restart the container (from project root):
    ```bash
-   cd build
-   docker-compose down
-   docker-compose up -d --build
+   docker-compose -f build/docker-compose.yml down
+   docker-compose -f build/docker-compose.yml up -d --build
    ```
 
 ### Troubleshooting
