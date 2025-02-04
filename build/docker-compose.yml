@@ -6,7 +6,7 @@ services:
       dockerfile: build/Dockerfile
     restart: always
     env_file:
-      - ../.env
+      - .env
     environment:
       - EMAIL_USERNAME=${EMAIL_USERNAME}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD}

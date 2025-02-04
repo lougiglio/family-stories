@@ -110,7 +110,6 @@ class ConfirmationEmail:
                     <p>"{question}"</p>
                     <p>Your response has been safely stored and can be accessed by you 
                     and your family members through your private account.</p>
-                    <p>Best regards,<br>Family Stories Team</p>
                 </body>
             </html>
             """
