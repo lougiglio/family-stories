@@ -2,15 +2,18 @@
 
 A Python application that sends weekly questions to family members and collects their responses via email.
 
-## VM Deployment & Management
+## Deployment & Management
 
 ### Initial Setup
 
 #### Option A: New Installation
 1. Create and navigate to your project directory:
    ```bash
-   mkdir -p /opt/family-stories
+   mkdir -p /opt/family-stories  # Linux/Mac
    cd /opt/family-stories
+   # OR for Windows:
+   mkdir family-stories
+   cd family-stories
    ```
 
 2. Initialize git and add remote repository:
@@ -39,27 +42,40 @@ git checkout -f main  # -f flag to overwrite existing files
    ```
 
 2. Install Docker and Docker Compose:
-   ```bash
-   sudo apt-get update
-   sudo apt-get install -y docker.io docker-compose
-   ```
+   - For Linux:
+     ```bash
+     sudo apt-get update
+     sudo apt-get install -y docker.io docker-compose
+     ```
+   - For Windows:
+     Download and install Docker Desktop from https://www.docker.com/products/docker-desktop
 
 ### Running the Application
+
+#### Linux/Mac
 1. Start the application (from the project root directory):
    ```bash
    # Make sure you're in the project root directory, not the build directory
-   docker-compose -f build/docker-compose.yml up -d
+   cd build
+   docker compose --env-file ../.env up --build
+   ```
+
+#### Windows
+1. Start the application (from the project root directory):
+   ```powershell
+   cd build
+   docker compose --env-file ../.env up --build
    ```
 
 2. Check application status:
    ```bash
-   docker-compose -f build/docker-compose.yml ps
-   docker-compose -f build/docker-compose.yml logs -f
+   docker compose ps
+   docker compose logs -f
    ```
 
 3. Stop the application:
    ```bash
-   docker-compose -f build/docker-compose.yml down
+   docker compose down
    ```
 
 ### Updating the Application
@@ -70,26 +86,33 @@ git checkout -f main  # -f flag to overwrite existing files
 
 2. Rebuild and restart the container (from project root):
    ```bash
-   docker-compose -f build/docker-compose.yml down
-   docker-compose -f build/docker-compose.yml up -d --build
+   cd build
+   docker compose --env-file ../.env up --build
    ```
 
 ### Troubleshooting
 - View application logs:
   ```bash
   cd build
-  docker-compose logs -f
+  docker compose logs -f
   ```
 
 - Check MongoDB connection:
   ```bash
-  docker-compose exec family-stories ping mongodb-host
+  docker compose exec family-stories ping mongodb
   ```
 
 - Restart the application:
   ```bash
   cd build
-  docker-compose restart
+  docker compose restart
+  ```
+
+#### Windows-Specific Issues
+- If environment variables are not being properly loaded, you can use the provided PowerShell script:
+  ```powershell
+  cd build
+  ./run.ps1
   ```
 
 ## Configuration Files

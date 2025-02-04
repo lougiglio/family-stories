@@ -52,11 +52,22 @@ class FamilyStoriesApp:
             current_question = self.questions[self.current_question_index]
             current_quote = self.quotes[self.current_question_index % len(self.quotes)]
             
-            success = self.email_sender.send_weekly_question(
-                current_question,
-                current_quote,
-                self.family_members
-            )
+            # Send to each family member
+            success = True
+            for member in self.family_members:
+                try:
+                    self.email_sender.send_weekly_question(
+                        recipient_email=member['email'],
+                        recipient_name=member['name'],
+                        questioner_name='Family Stories',
+                        question=current_question['question'],
+                        quote=current_quote['quote'],
+                        quote_author=current_quote['author'],
+                        question_number=self.current_question_index + 1
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to send email to {member['email']}: {str(e)}")
+                    success = False
             
             if success:
                 self.advance_question()
