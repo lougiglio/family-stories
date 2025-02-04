@@ -1,0 +1,10 @@
+email:
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  username: "${EMAIL_USERNAME}"
+  password: "${EMAIL_PASSWORD}"
+  imap_server: "imap.gmail.com"
+
+database:
+  mongodb_uri: "mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@vds.dannydemosi.com:27017/?authSource=admin"
+  database_name: "family_stories"

@@ -1,7 +1,3 @@
-# Project specific
-config.yml
-logs/
-
 # Environment files
 .env
 **/.env
@@ -9,60 +5,15 @@ logs/
 
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-.python-version
+*.pyc
 venv/
-ENV/
-
-# Docker
-.docker/
-
-# Testing
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
-.nox/
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*.swn
-*.bak
-.DS_Store
-Thumbs.db
 
 # Logs
 *.log
-*.log.*
+logs/
 
-# Local development
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+# IDE and System files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

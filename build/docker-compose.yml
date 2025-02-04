@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  family-stories:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    restart: always
+    env_file:
+      - ../.env
+    environment:
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+    network_mode: "host"
+    volumes:
+      - ../assets/emails.csv:/app/assets/emails.csv
+      - ../assets/questions.csv:/app/assets/questions.csv
+      - ../assets/quotes.csv:/app/assets/quotes.csv
+volumes:
+  mongodb_data:
