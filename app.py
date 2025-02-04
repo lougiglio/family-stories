@@ -23,7 +23,12 @@ class FamilyStoriesApp:
     def __init__(self, config_file='build/config.yml'):
         self.version = self.VERSION
         self.config = Config(config_file)
-        self.email_sender = EmailSender(self.config)
+        self.email_sender = EmailSender(
+            smtp_server=self.config.email_settings['smtp_server'],
+            smtp_port=self.config.email_settings['smtp_port'],
+            username=self.config.email_settings['username'],
+            password=self.config.email_settings['password']
+        )
         self.email_receiver = EmailReceiver(self.config)
         self.database = DatabaseManager(self.config)
         self.running = True

@@ -36,10 +36,11 @@ class DatabaseManager:
             self.client = MongoClient(
                 self.db_settings['mongodb_uri'],
                 maxPoolSize=50,
-                waitQueueTimeoutMS=2500,
-                connectTimeoutMS=2000,
-                serverSelectionTimeoutMS=3000,
-                retryWrites=True
+                waitQueueTimeoutMS=5000,
+                connectTimeoutMS=5000,
+                serverSelectionTimeoutMS=5000,
+                retryWrites=True,
+                retryReads=True
             )
             
             # Test connection before proceeding

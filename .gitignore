@@ -1,7 +1,11 @@
 # Project specific
 config.yml
-.env
 logs/
+
+# Environment files
+.env
+**/.env
+!.env.template
 
 # Python
 __pycache__/
@@ -9,6 +13,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -27,8 +32,10 @@ wheels/
 MANIFEST
 .python-version
 venv/
-env/
 ENV/
+
+# Docker
+.docker/
 
 # Testing
 .coverage
