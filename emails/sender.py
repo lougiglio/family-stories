@@ -102,3 +102,77 @@ class EmailSender:
         except Exception as e:
             logger.error(f"Failed to send confirmation to {recipient_email}: {str(e)}")
             raise
+
+    def forward_response(self, sender_email, sender_name, response_text, question, recipients):
+        """Forward a family member's response to a list of recipients"""
+        try:
+            logger.info(f"Forwarding response from {sender_email} to {len(recipients)} recipients")
+            
+            # Create message
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = f"Family Story Response: {sender_name}"
+            msg['From'] = self.username
+            
+            # Create HTML content
+            html_content = f"""
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .header {{ color: #2c3e50; margin-bottom: 20px; }}
+                    .question {{ font-style: italic; color: #7f8c8d; margin-bottom: 15px; }}
+                    .response {{ background-color: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; margin-bottom: 20px; }}
+                    .footer {{ font-size: 0.9em; color: #7f8c8d; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h2 class="header">Family Story Response</h2>
+                    <p>{sender_name} has shared a response to our family story question:</p>
+                    
+                    <div class="question">
+                        <strong>Question:</strong> {question}
+                    </div>
+                    
+                    <div class="response">
+                        <strong>{sender_name}'s Response:</strong><br><br>
+                        {response_text.replace('\n', '<br>')}
+                    </div>
+                    
+                    <div class="footer">
+                        <p>This is an automated message from the Family Stories app.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Attach HTML version
+            msg.attach(MIMEText(html_content, 'html'))
+            
+            # Send to each recipient
+            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                server.starttls()
+                server.login(self.username, self.password)
+                
+                for recipient in recipients:
+                    try:
+                        # Set recipient for this specific email
+                        msg['To'] = recipient['email']
+                        server.send_message(msg)
+                        logger.info(f"Successfully forwarded response to {recipient['email']}")
+                        
+                        # Clear the 'To' field for the next recipient
+                        del msg['To']
+                        
+                    except Exception as e:
+                        logger.error(f"Failed to forward response to {recipient['email']}: {str(e)}")
+                        # Continue with other recipients even if one fails
+                        continue
+                
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to forward response: {str(e)}")
+            return False

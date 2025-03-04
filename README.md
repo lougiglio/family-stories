@@ -124,3 +124,34 @@ git checkout -f main  # -f flag to overwrite existing files
 - `assets/emails.csv` - Family member contact information
 - `assets/questions.csv` - Weekly questions
 - `assets/quotes.csv` - Inspirational quotes 
+
+## Email Configuration Features
+
+### Weekly Questions Control
+To control which family members receive weekly questions, add a `ReceiveQuestions` column to your `assets/emails.csv` file:
+
+```csv
+Name,Email,ReceiveQuestions
+John Doe,john.doe@example.com,1
+Jane Smith,jane.smith@example.com,1
+Bob Johnson,bob.johnson@example.com,0
+```
+
+Set the value to 1 for family members who should receive weekly questions, and 0 for those who should not.
+
+### Email Forwarding Feature
+The application can automatically forward family member responses to other family members. This allows everyone to see each other's stories and memories.
+
+To control which family members receive forwarded responses, add a `ReceiveForwards` column to your `assets/emails.csv` file:
+
+```csv
+Name,Email,ReceiveForwards,ReceiveQuestions
+John Doe,john.doe@example.com,1,1
+Jane Smith,jane.smith@example.com,1,1
+Bob Johnson,bob.johnson@example.com,0,1
+Alice Johnson,alice.johnson@example.com,1,0
+```
+
+Set the value to 1 for family members who should receive forwarded responses, and 0 for those who should not.
+
+If these columns are not present, all family members will receive both weekly questions and forwarded responses by default. 

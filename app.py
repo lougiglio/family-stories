@@ -52,9 +52,14 @@ class FamilyStoriesApp:
             current_question = self.questions[self.current_question_index]
             current_quote = self.quotes[self.current_question_index % len(self.quotes)]
             
-            # Send to each family member
+            # Send to each family member who has receive_questions set to True
             success = True
             for member in self.family_members:
+                # Skip members who don't want to receive questions
+                if not member.get('receive_questions', True):
+                    logger.info(f"Skipping {member['email']} as they opted out of weekly questions")
+                    continue
+                    
                 try:
                     self.email_sender.send_weekly_question(
                         recipient_email=member['email'],
@@ -96,15 +101,38 @@ class FamilyStoriesApp:
                 )
                 logger.info(f"Successfully stored response from {response['email']} in database")
                 
+                # Get the sender's name
+                sender_name = self.database.get_family_member_name(response['email'])
+                if not sender_name:
+                    sender_name = 'Family Member'
+                
                 try:
-                    self.email_sender.send_confirmation_email(
+                    # Send confirmation email to the responder
+                    self.email_sender.send_confirmation(
                         response['email'],
-                        response.get('sender_name', 'Family Member'),
+                        sender_name,
                         current_question['question']  # Use actual question text
                     )
                     logger.info(f"Sent confirmation email to {response['email']}")
                 except Exception as e:
                     logger.error(f"Failed to send confirmation email: {str(e)}")
+                
+                try:
+                    # Forward the response to family members who have receive_forwards set to True (except the sender)
+                    recipients = [member for member in self.family_members 
+                                 if member['email'] != response['email'] and 
+                                 member.get('receive_forwards', True)]
+                    if recipients:
+                        self.email_sender.forward_response(
+                            sender_email=response['email'],
+                            sender_name=sender_name,
+                            response_text=response['response_text'],
+                            question=current_question['question'],
+                            recipients=recipients
+                        )
+                        logger.info(f"Forwarded response from {response['email']} to {len(recipients)} recipients")
+                except Exception as e:
+                    logger.error(f"Failed to forward response: {str(e)}")
                     
         except Exception as e:
             logger.error(f"Error checking responses: {str(e)}")

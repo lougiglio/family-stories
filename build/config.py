@@ -80,8 +80,26 @@ class Config:
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"CSV file not found: {file_path}")
             df = pd.read_csv(file_path)
-            return [{'name': name, 'email': email} 
-                   for name, email in zip(df['Name'], df['Email'])]
+            
+            members = []
+            for _, row in df.iterrows():
+                member = {'name': row['Name'], 'email': row['Email']}
+                
+                # Check for ReceiveForwards column
+                if 'ReceiveForwards' in df.columns:
+                    member['receive_forwards'] = bool(row['ReceiveForwards'])
+                else:
+                    member['receive_forwards'] = True
+                
+                # Check for ReceiveQuestions column
+                if 'ReceiveQuestions' in df.columns:
+                    member['receive_questions'] = bool(row['ReceiveQuestions'])
+                else:
+                    member['receive_questions'] = True
+                
+                members.append(member)
+            
+            return members
         except Exception as e:
             logger.error(f"Failed to load family members: {str(e)}")
             return []
@@ -109,3 +127,18 @@ class Config:
         except Exception as e:
             logger.error(f"Failed to load quotes: {str(e)}")
             return []
+
+    def load_forwarding_list(self, csv_file='assets/forwarding_list.csv'):
+        """Load the list of email addresses to forward responses to"""
+        try:
+            file_path = os.path.join(os.getcwd(), csv_file)
+            if not os.path.exists(file_path):
+                logger.warning(f"Forwarding list file not found: {file_path}. Using family members list instead.")
+                return None
+                
+            df = pd.read_csv(file_path)
+            return [{'name': row['Name'], 'email': row['Email']} 
+                   for _, row in df.iterrows() if row['Email'].strip()]
+        except Exception as e:
+            logger.error(f"Failed to load forwarding list: {str(e)}")
+            return None

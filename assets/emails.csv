@@ -1,3 +1,10 @@
-Name,Email
-Matt,mggummow@gmail.com
-Kelly,gummowkelly@gmail.com
+Name,Email,ReceiveForwards,ReceiveQuestions
+Matt,mggummow@gmail.com,1,1
+Kelly,gummowkelly@gmail.com,0,1
+Bryanna,bryanna.gummow@missionary.org,1,0
+Sara,sara.c.const@gmail.com,1,0
+Glade,gkgummow@gmail.com,1,0
+Aimee,babrunson630@gmail.com,1,0
+Daniel,rdgummow@gmail.com,1,0
+John,jconst91@gmail.com,1,0
+Danielle,elsha.sanjuan@gmail.com,1,0
