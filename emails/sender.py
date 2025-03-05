@@ -113,19 +113,26 @@ class EmailSender:
             msg['Subject'] = f"Family Story Response: {sender_name}"
             msg['From'] = self.username
             
-            # Create HTML content
-            html_content = f"""
+            # Preprocess the response text to replace newlines with <br> tags
+            formatted_response = response_text.replace('\n', '<br>')
+            
+            # Create HTML content - using string concatenation instead of f-strings for the CSS part
+            html_head = """
             <html>
             <head>
                 <style>
-                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                    .header {{ color: #2c3e50; margin-bottom: 20px; }}
-                    .question {{ font-style: italic; color: #7f8c8d; margin-bottom: 15px; }}
-                    .response {{ background-color: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; margin-bottom: 20px; }}
-                    .footer {{ font-size: 0.9em; color: #7f8c8d; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; }}
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { color: #2c3e50; margin-bottom: 20px; }
+                    .question { font-style: italic; color: #7f8c8d; margin-bottom: 15px; }
+                    .response { background-color: #f9f9f9; padding: 15px; border-left: 4px solid #3498db; margin-bottom: 20px; }
+                    .footer { font-size: 0.9em; color: #7f8c8d; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; }
                 </style>
             </head>
+            """
+            
+            # Now use f-strings for the dynamic content
+            html_body = f"""
             <body>
                 <div class="container">
                     <h2 class="header">Family Story Response</h2>
@@ -137,7 +144,7 @@ class EmailSender:
                     
                     <div class="response">
                         <strong>{sender_name}'s Response:</strong><br><br>
-                        {response_text.replace('\n', '<br>')}
+                        {formatted_response}
                     </div>
                     
                     <div class="footer">
@@ -147,6 +154,9 @@ class EmailSender:
             </body>
             </html>
             """
+            
+            # Combine the HTML parts
+            html_content = html_head + html_body
             
             # Attach HTML version
             msg.attach(MIMEText(html_content, 'html'))

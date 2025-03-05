@@ -1,6 +1,13 @@
 # Family Stories Application
 
-A Python application that sends weekly questions to family members and collects their responses via email.
+A Python application that sends weekly questions to family members and collects their responses via email. The application also forwards responses to other family members, allowing everyone to share in the stories and memories.
+
+## Features
+
+- **Weekly Questions**: Automatically sends weekly questions to selected family members
+- **Response Collection**: Collects and stores email responses in a MongoDB database
+- **Email Forwarding**: Forwards responses to other family members (configurable)
+- **Selective Distribution**: Control which family members receive questions and/or forwarded responses
 
 ## Deployment & Management
 
@@ -35,8 +42,9 @@ git checkout -f main  # -f flag to overwrite existing files
 ```
 
 ### Configuration
-1. Create and configure `.env` file:
+1. Create and configure `.env` file in the build directory:
    ```bash
+   cd build
    cp .env.template .env
    # Edit .env with your MongoDB and Email credentials
    ```
@@ -64,7 +72,7 @@ git checkout -f main  # -f flag to overwrite existing files
 1. Start the application (from the project root directory):
    ```powershell
    cd build
-   docker compose --env-file ../.env up --build
+   docker compose --env-file .env up --build
    ```
 
 2. Check application status:
@@ -78,80 +86,125 @@ git checkout -f main  # -f flag to overwrite existing files
    docker compose down
    ```
 
+### Proxmox Deployment
+To deploy in Proxmox:
+
+1. Create a Linux Container (LXC) or Virtual Machine (VM) in Proxmox
+2. Install Docker and Docker Compose:
+   ```bash
+   apt update
+   apt install -y apt-transport-https ca-certificates curl software-properties-common
+   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+   add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+   apt update
+   apt install -y docker-ce docker-ce-cli containerd.io docker-compose git
+   ```
+
+3. Clone the repository and configure:
+   ```bash
+   mkdir -p /opt/family-stories
+   cd /opt/family-stories
+   git init
+   git remote add origin https://github.com/yourusername/family-stories.git
+   git fetch
+   git checkout main
+   cd build
+   cp .env.template .env
+   nano .env  # Edit with your credentials
+   ```
+
+4. Start the application:
+   ```bash
+   # Already in the build directory
+   docker-compose --env-file .env up -d --build
+   ```
+
+5. Set up auto-start on boot:
+   ```bash
+   cat > /etc/systemd/system/family-stories.service << 'EOL'
+   [Unit]
+   Description=Family Stories Application
+   After=docker.service
+   Requires=docker.service
+
+   [Service]
+   Type=oneshot
+   RemainAfterExit=yes
+   WorkingDirectory=/opt/family-stories/build
+   ExecStart=/usr/bin/docker-compose --env-file .env up -d
+   ExecStop=/usr/bin/docker-compose down
+   TimeoutStartSec=0
+
+   [Install]
+   WantedBy=multi-user.target
+   EOL
+
+   systemctl enable family-stories.service
+   systemctl start family-stories.service
+   ```
+
 ### Updating the Application
 1. Pull latest changes from GitHub:
    ```bash
+   cd /opt/family-stories
    git pull origin main
    ```
 
-2. Rebuild and restart the container (from project root):
+2. Rebuild and restart the container:
    ```bash
    cd build
-   docker compose --env-file ../.env up --build
+   docker-compose --env-file .env up -d --build
    ```
 
 ### Troubleshooting
 - View application logs:
   ```bash
-  cd build
-  docker compose logs -f
+  cd /opt/family-stories/build
+  docker-compose logs -f
   ```
 
 - Check MongoDB connection:
   ```bash
-  docker compose exec family-stories ping mongodb
+  docker-compose exec family-stories ping mongodb
   ```
 
 - Restart the application:
   ```bash
-  cd build
-  docker compose restart
-  ```
-
-#### Windows-Specific Issues
-- If environment variables are not being properly loaded, you can use the provided PowerShell script:
-  ```powershell
-  cd build
-  ./run.ps1
+  cd /opt/family-stories/build
+  docker-compose restart
   ```
 
 ## Configuration Files
-- `.env` - Environment variables for MongoDB and Email settings
+- `build/.env` - Environment variables for MongoDB and Email settings
 - `build/config.yml` - Application configuration
 - `assets/` - Contains CSV files for emails, questions, and quotes
 
 ## Data Files
-- `assets/emails.csv` - Family member contact information
-- `assets/questions.csv` - Weekly questions
-- `assets/quotes.csv` - Inspirational quotes 
 
-## Email Configuration Features
-
-### Weekly Questions Control
-To control which family members receive weekly questions, add a `ReceiveQuestions` column to your `assets/emails.csv` file:
-
-```csv
-Name,Email,ReceiveQuestions
-John Doe,john.doe@example.com,1
-Jane Smith,jane.smith@example.com,1
-Bob Johnson,bob.johnson@example.com,0
-```
-
-Set the value to 1 for family members who should receive weekly questions, and 0 for those who should not.
-
-### Email Forwarding Feature
-The application can automatically forward family member responses to other family members. This allows everyone to see each other's stories and memories.
-
-To control which family members receive forwarded responses, add a `ReceiveForwards` column to your `assets/emails.csv` file:
+### Family Members Configuration (assets/emails.csv)
+The `emails.csv` file controls who receives weekly questions and forwarded responses:
 
 ```csv
 Name,Email,ReceiveForwards,ReceiveQuestions
-John Doe,john.doe@example.com,1,1
-Jane Smith,jane.smith@example.com,1,1
-Bob Johnson,bob.johnson@example.com,0,1
-Alice Johnson,alice.johnson@example.com,1,0
+Matt,mggummow@gmail.com,1,1
+Kelly,gummowkelly@gmail.com,0,1
+Bryanna,bryanna.gummow@missionary.org,1,0
 ```
 
-Set the value to 1 for family members who should receive forwarded responses, and 0 for those who should not.
+- **Name**: Family member's name
+- **Email**: Family member's email address
+- **ReceiveForwards**: Set to 1 to receive forwarded responses, 0 to opt out
+- **ReceiveQuestions**: Set to 1 to receive weekly questions, 0 to opt out
 
-If these columns are not present, all family members will receive both weekly questions and forwarded responses by default. 
+### Other Data Files
+- `assets/questions.csv` - Weekly questions to send to family members
+- `assets/quotes.csv` - Inspirational quotes to include with weekly questions
+
+## How It Works
+
+1. **Weekly Questions**: Every Sunday at 6 AM, the application sends the current question to family members who have `ReceiveQuestions=1`
+2. **Response Collection**: When family members reply to the question email, the application:
+   - Stores the response in the MongoDB database
+   - Sends a confirmation email to the responder
+   - Forwards the response to all family members who have `ReceiveForwards=1` (except the original responder)
+3. **Email Checking**: The application checks for new responses every 15 minutes between 6 AM and 10 PM 
