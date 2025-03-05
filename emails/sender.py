@@ -116,7 +116,7 @@ class EmailSender:
             # Preprocess the response text to replace newlines with <br> tags
             formatted_response = response_text.replace('\n', '<br>')
             
-            # Create HTML content - using string concatenation instead of f-strings for the CSS part
+            # Create HTML content
             html_head = """
             <html>
             <head>

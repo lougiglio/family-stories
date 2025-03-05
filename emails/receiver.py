@@ -18,8 +18,8 @@ class EmailReceiver:
             mail.login(self.email_settings['username'], self.email_settings['password'])
             mail.select('inbox')
 
-            # Search for unread responses
-            _, messages = mail.search(None, 'UNSEEN SUBJECT "Re: Weekly Family Story Question"')
+            # Search for unread responses containing "Weekly Question" instead of exact subject match
+            _, messages = mail.search(None, 'UNSEEN SUBJECT "Weekly Question"')
             responses = []
             
             for msg_num in messages[0].split():
